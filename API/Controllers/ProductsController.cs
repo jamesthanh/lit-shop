@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Infrastucture.Data;
 using Core.Entities;
 using Core.Interfaces;
+using Core.Specifications;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,14 +29,16 @@ namespace API.Controllers
         // using task to pass the request to a delegate and it does not wait
         public async Task<ActionResult<List<Product>>>  GetProducts()
         {
-            var products = await _productsRepository.ListAllAsync();
+            var spec = new ProductsWithTypesAndBrandsSpecification();
+            var products = await _productsRepository.ListAsync(spec);
             return Ok(products);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            return await _productsRepository.GetByIdAsync(id);
+            var spec = new ProductsWithTypesAndBrandsSpecification(id);
+            return await _productsRepository.GetEntityWithSpec(spec);
         }
 
         [HttpGet("brands")]
